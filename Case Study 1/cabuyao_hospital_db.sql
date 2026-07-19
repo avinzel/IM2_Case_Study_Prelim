@@ -64,6 +64,13 @@ create table payments(
     foreign key(consultation_id) references consultations(consultation_id) 
 );
  
+ INSERT INTO departments (department_name) VALUES 
+("TestData1"),
+("TestData2"),
+("TestData3");
+
+truncate departments;
+ 
 INSERT INTO departments (department_name) VALUES 
 ('General Medicine'),
 ('Pediatrics'),
@@ -109,7 +116,8 @@ INSERT INTO doctors (doctor_name, department_id, email, phone_number) VALUES
 ('Dr. Beatrice Villamin', 4, 'b.villamin@cabuyaohosp.com', '09991234567'),
 ('Dr. Christopher Castillo', 4, 'chris.castillo@cabuyaohosp.com', '09991234568'),
 ('Dr. Ferdinand Mendoza', 5, 'ferdie.mendoza@cabuyaohosp.com', '09991234569'),
-('Dr. Stephanie Alcantara', 5, 'steph.alcantara@cabuyaohosp.com', '09991234570');
+('Dr. Stephanie Alcantara', 5, 'steph.alcantara@cabuyaohosp.com', '09991234570'),
+('Dr. Cardo Dalisay', 2, 'cardo.dang@cabuyaohosp.com', '09991454361');
 
 -- --------------------------------------------------------
 -- 4. INSERTING 8 MEDICINES
@@ -173,3 +181,31 @@ INSERT INTO payments (consultation_id, amount_paid, amount_due, payment_status, 
 (35, 800.00, 800.00, 'Paid', 'Credit Card'), (36, 800.00, 800.00, 'Paid', 'Cash'),
 (37, 700.00, 700.00, 'Paid', 'Insurance'), (38, 700.00, 700.00, 'Paid', 'Cash'),
 (39, 750.00, 750.00, 'Paid', 'GCash'), (40, 750.00, 750.00, 'Paid', 'Cash');
+
+
+update patients set patient_name = "Manuel Cavite" where patient_id  = 7; 
+
+delete from doctors where doctor_id = 11;
+
+delimiter //
+	create procedure registerPatient(
+		in n_patient_name varchar(255), 
+		n_birth_date date, 
+		n_email varchar(255) , 
+		n_sex char(1) , 
+		n_phone_number  varchar (20)
+	)
+		begin
+			insert into patients(patient_name, birth_date, email, sex, phone_number)
+            values
+            (n_patient_name,n_birth_date,n_email,n_sex,n_phone_number);
+		end //
+delimiter ;
+
+call registerPatient(
+	"Vincent Lemuel T. Mandap",
+    '2006-10-29',
+    'vincent@gmail.com',
+    'M',
+    "099534554542"
+); 
