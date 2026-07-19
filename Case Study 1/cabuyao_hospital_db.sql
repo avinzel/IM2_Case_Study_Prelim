@@ -187,13 +187,15 @@ update patients set patient_name = "Manuel Cavite" where patient_id  = 7;
 
 delete from doctors where doctor_id = 11;
 
+
+
 delimiter //
 	create procedure registerPatient(
 		in n_patient_name varchar(255), 
-		n_birth_date date, 
-		n_email varchar(255) , 
-		n_sex char(1) , 
-		n_phone_number  varchar (20)
+		in n_birth_date date, 
+		in n_email varchar(255) , 
+		in n_sex char(1) , 
+		in n_phone_number  varchar (20)
 	)
 		begin
 			insert into patients(patient_name, birth_date, email, sex, phone_number)
