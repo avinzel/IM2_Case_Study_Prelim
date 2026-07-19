@@ -1,30 +1,41 @@
-
+-- Creates the hospital database and sets it as the active schema
 create database cabuyao_hospital_db; 
 use cabuyao_hospital_db;
 
+-- --------------------------------------------------------
+-- DATA DEFINTION (TABLE CREATION)
+-- --------------------------------------------------------
+
+-- Contains primary demographics and registration logs for patients
 create table patients(
-	patient_id int auto_increment primary key, 
-	patient_name varchar(255) not null,
+    patient_id int auto_increment primary key, 
+    patient_name varchar(255) not null,
     birth_date date not null, 
     email varchar(255) not null unique,
     sex char(1) not null ,
     registered_at date default (curdate()) ,
     phone_number varchar (20)not null unique
 );
+
+-- Stores distinct medical departments within the facility
 create table departments(
-	department_id int auto_increment primary key,
+    department_id int auto_increment primary key,
     department_name varchar(50) not null
 );
+
+-- Details practicing clinicians mapped to their designated medical department
 create table doctors(
-	doctor_id int auto_increment primary key, 
-	doctor_name varchar(255) not null,
+    doctor_id int auto_increment primary key, 
+    doctor_name varchar(255) not null,
     department_id int not null ,
     email varchar(255) not null unique,
     phone_number varchar (20)not null unique,
     foreign key (department_id) references departments(department_id )
 );
+
+-- Records specific patient-doctor visits and associated baseline fees
 create table consultations(
-	consultation_id int auto_increment primary key,
+    consultation_id int auto_increment primary key,
     doctor_id  int not null ,
     patient_id  int not null ,
     consultation_date date not null,
@@ -32,45 +43,57 @@ create table consultations(
     foreign key(doctor_id) references doctors(doctor_id),
     foreign key(patient_id) references patients(patient_id) 
 );
+
+-- Inventory listing for pharmacy products, tracking quantities and expiry dates
 create table medicines(
-	medicine_id int auto_increment primary key,
+    medicine_id int auto_increment primary key,
     medicine_name varchar(255) not null,
     stock int(10) not null default 0,
     price decimal(10,2) not null,
-	expiry_date date not null,
+    expiry_date date not null,
     batch_number VARCHAR(50)
 );
+
+-- Maps prescribed pharmaceutical provisions issued during distinct patient consultations
 create table prescriptions(
-	prescription_id int auto_increment primary key, 
-	doctor_id int not null,
-	patient_id int not null,
+    prescription_id int auto_increment primary key, 
+    doctor_id int not null,
+    patient_id int not null,
     consultation_id int not null,
     medicine_id int not null,
     quantity int not null default 1,
     prescribed_at date default (current_date()) ,
     foreign key(doctor_id) references doctors(doctor_id),
-	foreign key(patient_id) references patients(patient_id) ,
-	foreign key(consultation_id) references consultations(consultation_id) ,
+    foreign key(patient_id) references patients(patient_id) ,
+    foreign key(consultation_id) references consultations(consultation_id) ,
     foreign key(medicine_id) references medicines(medicine_id) 
 );
 
+-- Financial tracking logs evaluating invoices and transaction statuses for checkups
 create table payments(
-	payment_id int auto_increment primary key,
+    payment_id int auto_increment primary key,
     consultation_id int not null,
     amount_paid decimal(10,2) not null ,
     amount_due decimal(10,2) not null ,
     payment_status varchar(50) not null,
-	payment_method varchar(50) not null,
+    payment_method varchar(50) not null,
     foreign key(consultation_id) references consultations(consultation_id) 
 );
  
- INSERT INTO departments (department_name) VALUES 
+-- --------------------------------------------------------
+-- SEEDING AND INITIAL RECORD OPERATIONS
+-- --------------------------------------------------------
+
+-- Populates initial test instances to verify schema structure
+INSERT INTO departments (department_name) VALUES 
 ("TestData1"),
 ("TestData2"),
 ("TestData3");
 
+-- Cleans out the test markers to reset structure counters cleanly
 truncate departments;
  
+-- Populates the official production department entries
 INSERT INTO departments (department_name) VALUES 
 ('General Medicine'),
 ('Pediatrics'),
@@ -78,9 +101,7 @@ INSERT INTO departments (department_name) VALUES
 ('OB-GYN'),
 ('Orthopedics');
 
--- --------------------------------------------------------
--- 2. INSERTING 20 PATIENTS
--- --------------------------------------------------------
+-- Inserts 20 distinct patient profiles into the demographics ledger
 INSERT INTO patients (patient_name, birth_date, email, sex, registered_at, phone_number) VALUES
 ('Juan Dela Cruz', '1990-05-15', 'juan.delacruz@email.com', 'M', '2026-01-10', '09171234561'),
 ('Maria Clara Santos', '1995-10-22', 'maria.clara@email.com', 'F', '2026-01-11', '09182345672'),
@@ -103,9 +124,7 @@ INSERT INTO patients (patient_name, birth_date, email, sex, registered_at, phone
 ('Juan Luna', '1965-10-24', 'jluna.spoliarium@email.com', 'M', '2026-02-06', '09359012350'),
 ('Gregoria De Jesus', '1994-05-09', 'gregoria.dj@email.com', 'F', '2026-02-07', '09360123451');
 
--- --------------------------------------------------------
--- 3. INSERTING 10 DOCTORS
--- --------------------------------------------------------
+-- Inserts initial 11 active physician assignments mapped to internal departments
 INSERT INTO doctors (doctor_name, department_id, email, phone_number) VALUES
 ('Dr. Ricardo Carandang', 1, 'ricardo.carandang@cabuyaohosp.com', '09991234561'),
 ('Dr. Maria Theresa Cruz', 1, 'mt.cruz@cabuyaohosp.com', '09991234562'),
@@ -119,9 +138,7 @@ INSERT INTO doctors (doctor_name, department_id, email, phone_number) VALUES
 ('Dr. Stephanie Alcantara', 5, 'steph.alcantara@cabuyaohosp.com', '09991234570'),
 ('Dr. Cardo Dalisay', 2, 'cardo.dang@cabuyaohosp.com', '09991454361');
 
--- --------------------------------------------------------
--- 4. INSERTING 8 MEDICINES
--- --------------------------------------------------------
+-- Inserts baseline pharmaceutical items with available stock and cost metrics
 INSERT INTO medicines (medicine_name, stock, price, expiry_date, batch_number) VALUES
 ('Paracetamol (Biogesic) 500mg', 500, 5.00, '2028-12-01', 'BATCH-PCM01'),
 ('Amoxicillin 500mg', 300, 8.50, '2027-06-15', 'BATCH-AMX02'),
@@ -132,9 +149,7 @@ INSERT INTO medicines (medicine_name, stock, price, expiry_date, batch_number) V
 ('Losartan 50mg', 300, 9.00, '2028-05-14', 'BATCH-LOS07'),
 ('Mefenamic Acid 500mg', 150, 7.50, '2027-08-30', 'BATCH-MEF08');
 
--- --------------------------------------------------------
--- 5. INSERTING 40 CONSULTATIONS
--- --------------------------------------------------------
+-- Inserts 40 initial appointment logs tracking consultation distribution
 INSERT INTO consultations (doctor_id, patient_id, consultation_date, consultation_fee) VALUES
 (1, 1, '2026-02-10', 500.00), (2, 2, '2026-02-10', 500.00),
 (3, 3, '2026-02-11', 600.00), (4, 4, '2026-02-11', 600.00),
@@ -157,9 +172,7 @@ INSERT INTO consultations (doctor_id, patient_id, consultation_date, consultatio
 (7, 11, '2026-02-28', 700.00), (8, 14, '2026-02-28', 700.00),
 (9, 3, '2026-03-01', 750.00), (10, 9, '2026-03-01', 750.00);
 
--- --------------------------------------------------------
--- 6. INSERTING 40 PAYMENTS (Matching the Consultation Fees)
--- --------------------------------------------------------
+-- Inserts corresponding settlement balances matching invoice requirements
 INSERT INTO payments (consultation_id, amount_paid, amount_due, payment_status, payment_method) VALUES
 (1, 500.00, 500.00, 'Paid', 'Cash'), (2, 500.00, 500.00, 'Paid', 'GCash'),
 (3, 600.00, 600.00, 'Paid', 'Cash'), (4, 600.00, 600.00, 'Paid', 'Maya'),
@@ -182,32 +195,37 @@ INSERT INTO payments (consultation_id, amount_paid, amount_due, payment_status, 
 (37, 700.00, 700.00, 'Paid', 'Insurance'), (38, 700.00, 700.00, 'Paid', 'Cash'),
 (39, 750.00, 750.00, 'Paid', 'GCash'), (40, 750.00, 750.00, 'Paid', 'Cash');
 
-
+-- Corrects data entry anomalies by updating specific patient record name fields
 update patients set patient_name = "Manuel Cavite" where patient_id  = 7; 
 
+-- Purges individual practitioners from active tables when contract shifts occur
 delete from doctors where doctor_id = 11;
 
+-- --------------------------------------------------------
+-- STORED PROCEDURES
+-- --------------------------------------------------------
 
-
+-- Defines routine structure to safely register intake attributes for patients
 delimiter //
-	create procedure registerPatient(
-		in n_patient_name varchar(255), 
-		in n_birth_date date, 
-		in n_email varchar(255) , 
-		in n_sex char(1) , 
-		in n_phone_number  varchar (20)
-	)
-		begin
-			insert into patients(patient_name, birth_date, email, sex, phone_number)
+    create procedure registerPatient(
+        in n_patient_name varchar(255), 
+        in n_birth_date date, 
+        in n_email varchar(255) , 
+        in n_sex char(1) , 
+        in n_phone_number  varchar (20)
+    )
+        begin
+            insert into patients(patient_name, birth_date, email, sex, phone_number)
             values
             (n_patient_name,n_birth_date,n_email,n_sex,n_phone_number);
-		end //
+        end //
 delimiter ;
 
+-- Executes procedure routine to append a newly verified clinical intake entry
 call registerPatient(
-	"Vincent Lemuel T. Mandap",
+    "Vincent Lemuel T. Mandap",
     '2006-10-29',
     'vincent@gmail.com',
     'M',
     "099534554542"
-); 
+);
