@@ -229,3 +229,42 @@ call registerPatient(
     'M',
     "099534554542"
 );
+
+delimiter //
+	create procedure doctorConsultation(
+		in n_doctor_id int, 
+        in n_patient_id int , 
+        in n_consultation_date date, 
+        in n_consultation_fee decimal(10,2)
+	)
+    begin
+		declare consultationType varchar(50);
+        INSERT INTO consultations (doctor_id, patient_id, consultation_date, consultation_fee) 
+        VALUES
+        (n_doctor_id,n_patient_id,n_consultation_date ,n_consultation_fee);
+        
+        if n_consultation_fee >= 1000 then
+        set consultationType = 'Special Consultation';
+        select consultationType as Consultation_Type; 
+        else 
+		set consultationType = 'Regular Consultation';
+		select consultationType as Consultation_Type; 
+        end if;
+    end //
+delimiter ;
+
+call doctorConsultation(
+	2,
+    7,
+    '2026-07-25',
+    2000.00
+);
+
+call doctorConsultation(
+	10,
+    1,
+    '2026-07-30',
+    500.00
+);
+
+
