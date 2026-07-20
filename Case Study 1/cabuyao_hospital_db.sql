@@ -195,6 +195,14 @@ INSERT INTO payments (consultation_id, amount_paid, amount_due, payment_status, 
 (37, 700.00, 700.00, 'Paid', 'Insurance'), (38, 700.00, 700.00, 'Paid', 'Cash'),
 (39, 750.00, 750.00, 'Paid', 'GCash'), (40, 750.00, 750.00, 'Paid', 'Cash');
 
+-- inserts  prescription records
+INSERT INTO prescriptions (doctor_id, patient_id, consultation_id, medicine_id, quantity, prescribed_at) VALUES
+(1, 1, 1, 1, 2, '2026-02-10'),  
+(3, 3, 3, 2, 1, '2026-02-11'),   
+(5, 5, 5, 4, 3, '2026-02-12'),   
+(7, 7, 7, 3, 2, '2026-02-13'),   
+(9, 9, 9, 7, 1, '2026-02-14');  
+
 -- Fixing a typo in a patient's name
 update patients set patient_name = "Manuel Cavite" where patient_id  = 7; 
 
